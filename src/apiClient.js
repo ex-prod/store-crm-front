@@ -1,7 +1,7 @@
 import {writable} from 'svelte/store';
 
-let domain = 'https://dev.mft-prod.ru';
-// let domain = 'http://localhost:8080';
+// let domain = 'https://dev.mft-prod.ru';
+let domain = 'http://localhost:8080';
 
 export let credentials = writable({
     basicAuthToken: "",
@@ -56,13 +56,43 @@ export async function getVariants(unitId, search) {
 }
 
 export async function getOrders(unitId) {
-    let path = "/api/units/" + unitId + "/customerorders";
+    const path = "/api/units/" + unitId + "/customerorders";
     return get(path);
+}
+
+export async function createOrder(unitId, data) {
+    const path = "/api/units/" + unitId + "/customerorders";
+
+    return post(path, data);
 }
 
 async function get(path) {
     console.log(basicAuthToken);
     const res = fetch(domain + path, {
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: basicAuthToken
+        }
+    });
+
+    res.then((result) => {
+        if (result.status === 401) {
+            credentials.update(() => { return {
+                basicAuthToken: "",
+                loggedIn: false
+            }});
+            basicAuthToken = "";
+        }
+    });
+
+    return (await res).json();
+}
+
+async function post(path, data) {
+    const res = fetch(domain + path, {
+        method: 'POST',
+        body: JSON.stringify(data),
         headers: {
             "Content-Type": "application/json",
             Accept: "application/json",

@@ -30,7 +30,6 @@
 <h3>Товары:</h3>
 <input type="text" bind:value={search} on:keyup={searchVariantsEvent} />
 {#await variantsPromise}
-    <p>Загрузка товаров...</p>
 {:then variants}
     <ul>
         {#each variants as variant}
