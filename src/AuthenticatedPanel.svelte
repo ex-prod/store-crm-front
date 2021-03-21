@@ -14,6 +14,7 @@
     // pages for this layout
     import OrderList from "./OrderList.svelte";
     import OrderAddForm from "./OrderAddForm.svelte";
+    import OrderConfirmForm from "./OrderConfirmForm.svelte";
     import Settings from "views/admin/Settings.svelte";
     import Tables from "views/admin/Tables.svelte";
     import Maps from "views/admin/Maps.svelte";

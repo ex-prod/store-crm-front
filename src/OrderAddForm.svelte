@@ -4,6 +4,8 @@
 
   import { getVariants, createOrder } from './apiClient.js';
 
+  import OrderConfirmForm from './OrderConfirmForm.svelte';
+
   let variantsPromise;
   let selectedUnitId;
   let search = '';
@@ -12,6 +14,9 @@
   let totalAmount = 0;
   let totalCount = 0;
   let totalPositions = 0;
+  let remoteCreatedOrder = {
+    state: undefined
+  };
   let orderData = {
     comment: "",
     prepaidType: "PARTIAL",
@@ -22,7 +27,8 @@
     phone: "",
     city: "",
     zip: "",
-    address: ""
+    address: "",
+    deliveryIsPresent: false
   }
 
   function createOrderButtonPressed() {
@@ -52,11 +58,16 @@
       prepaidType: orderData.prepaidType,
       deliveryCost: orderData.deliveryCost,
       deliveryType: orderData.deliveryType,
+      deliveryIsPresent: orderData.deliveryIsPresent,
       positions: positions
     }
     console.log(data);
     const createdOrder = createOrder(selectedUnitId, data);
     console.log(createdOrder);
+    createdOrder.then(order => {
+        console.log(order);
+        remoteCreatedOrder = order;
+    });
   }
 
   currentUnitId.subscribe((unitId) => {
@@ -255,6 +266,13 @@
               <h6 class="text-gray-500 text-sm mt-3 mb-6 font-bold uppercase">Доставка</h6>
               <div class="flex flex-wrap">
                 <div class="w-full lg:w-3/12 px-4 mb-3">
+                  <input id="grid-delivery-type-mail-rf" type="radio"
+                         class="relative px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline ease-linear transition-all duration-150"
+                         value="RUSSIAN_MAIL" bind:group={orderData.deliveryType} >
+                  <label class="relative uppercase text-gray-700 text-xs font-bold mb-2" for="grid-delivery-type-mail-rf">
+                    Почта РФ
+                  </label>
+                  <br />
                   <input id="grid-delivery-type-storage" type="radio"
                          class="relative px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline ease-linear transition-all duration-150"
                          value="SDEK_STORAGE" bind:group={orderData.deliveryType} >
@@ -273,7 +291,7 @@
                 <div class="w-full lg:w-9/12 px-4 mb-3">
                   <input id="grid-delivery-present" type="checkbox"
                          class="relative px-3 py-3 placeholder-gray-400 text-gray-700 bg-white rounded text-sm shadow focus:outline-none focus:shadow-outline ease-linear transition-all duration-150"
-                         value="delivery-present">
+                         bind:checked={orderData.deliveryIsPresent}>
                   <label class="relative uppercase text-gray-700 text-xs font-bold mb-2" for="grid-delivery-present">
                     Доставка за наш счет
                   </label>
@@ -342,7 +360,7 @@
               </div>
             </form>
           </div>
-
+          {#if remoteCreatedOrder.state !== 'NEW' && remoteCreatedOrder.state !== 'CONFIRMED'}
           <div class="rounded-t bg-white mb-0 px-6 py-6">
             <div class="text-center flex justify-between">
               <button class="bg-red-500 text-white active:bg-red-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
@@ -350,7 +368,11 @@
               </button>
             </div>
           </div>
+          {/if}
 
+        </div>
+        <div>
+          <OrderConfirmForm bind:order={remoteCreatedOrder} />
         </div>
       </div>
     </div>

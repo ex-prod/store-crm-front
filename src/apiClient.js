@@ -66,6 +66,18 @@ export async function createOrder(unitId, data) {
     return post(path, data);
 }
 
+export async function confirmOrder(unitId, orderId) {
+    const path = "/api/units/" + unitId + "/customerorders/" + orderId + "/confirm";
+
+    return post(path, {});
+}
+
+export async function cancelOrder(unitId, orderId) {
+    const path = "/api/units/" + unitId + "/customerorders" + orderId + "/cancel";
+
+    return post(path, {});
+}
+
 async function get(path) {
     console.log(basicAuthToken);
     const res = fetch(domain + path, {
